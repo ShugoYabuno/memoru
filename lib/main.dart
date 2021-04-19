@@ -38,7 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Card(
               child: ListTile(
                 title: Text("テスト$index"),
-                subtitle: Text("これはメモアプリの中のタイトルです。"),
+                subtitle: Text("うぉぉぉぉぉぉぉぉぉぉおx。"),
               ),
             ),
           );
