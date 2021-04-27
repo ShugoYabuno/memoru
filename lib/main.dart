@@ -1,49 +1,56 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import './edit.dart';
 
-void main() => runApp(new MyApp());
+// We create a "provider", which will store a value (here "Hello world").
+// By using a provider, this allows us to mock/override the value exposed.
+final helloWorldProvider = Provider((_) => 'test');
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter Demo',
-      theme: new ThemeData(primaryColor: Colors.white),
-      home: new MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => new _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("テスト"),
+void main() {
+  runApp(
+    // For widgets to be able to read providers, we need to wrap the entire
+    // application in a "ProviderScope" widget.
+    // This is where the state of our providers will be stored.
+    ProviderScope(
+      child: MaterialApp(
+        title: 'test',
+        initialRoute: '/',
+        routes: {
+          '/': (context) => Home(),
+          '/edit': (context) => Edit(),
+        },
       ),
-      body: ListView(
-        children: List.generate(10, (int index) {
-          // メインで編集する部分↓
-          return InkWell(
-            onTap: () {
-              Navigator.push(
-                  context, CupertinoPageRoute(builder: (context) => Edit()));
-            },
-            child: Card(
-              child: ListTile(
-                title: Text("テスト$index"),
-                subtitle: Text("うぉぉぉぉぉぉぉぉぉぉおx。"),
+    ),
+  );
+}
+
+// Note: MyApp is a HookWidget, from flutter_hooks.
+class Home extends HookWidget {
+  @override
+  Widget build(BuildContext context) {
+    // To read our provider, we can use the hook "useProvider".
+    // This is only possible because MyApp is a HookWidget.
+    final String value = useProvider(helloWorldProvider);
+
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('Example'),
+        ),
+        body: ListView(
+          children: List.generate(10, (int index) {
+            return InkWell(
+              onTap: () async {
+                await Navigator.of(context).pushNamed('/edit');
+              },
+              child: Card(
+                child: ListTile(
+                  title: Text("$value$indexああ"),
+                  subtitle: Text("サブタイトル"),
+                ),
               ),
-            ),
-          );
-        }),
-      ),
-    );
+            );
+          }),
+        ));
   }
 }
